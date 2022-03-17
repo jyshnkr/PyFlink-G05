@@ -10,4 +10,4 @@
 
 ## Description
 
-A Big data project to develop Google Page Rank System using Flink with Python.
+A Big data project to develop Google Page Rank System using Apache Flink with Python.
