@@ -10,4 +10,4 @@
 
 ## Description
 
-Big data project to develop Google Page Rank System using spark with PyFlink
+A Big data project to develop Google Page Rank System using Flink with Python.
