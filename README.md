@@ -34,6 +34,8 @@ The PageRank algorithm outputs a probability distribution used to represent the 
 
 ## Madhu Babu Arla
 
+I learned and researched about page rank and page rank algorithm, And posted the same.
+
 ## Pariveshita Thota
 
 ## Nandini Kandi
