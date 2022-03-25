@@ -18,6 +18,8 @@ A Big data project to develop Google Page Rank System using Apache Flink with Py
 
 ## Abhilash Ramavaram
 
+Added with an example of written page rank
+
 ## Anutej Gunda
 
 ## JayaShankar Mangina
