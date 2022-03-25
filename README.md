@@ -38,7 +38,7 @@ The PageRank algorithm outputs a probability distribution used to represent the 
 
 ## Abhilash Ramavaram
 
-## Anutej Gunda
+## Anu Teja Gunda
 
 ## JayaShankar Mangina
 
@@ -52,3 +52,9 @@ I learned and researched about page rank and page rank algorithm, And posted the
 ## Nandini Kandi
 
 I have initiated the wiki for our repository and created sub-pages namely contributions, work, issues, and also allocated sub-pages for every team member.
+
+
+# References
+1. Apache Flink - https://en.wikipedia.org/wiki/Apache_Flink
+2. Page Rank Definition and Algorithm Explaination - https://www.geeksforgeeks.org/page-rank-algorithm-implementation/
+3. PageRank Example - https://thinkinfi.com/page-rank-algorithm-and-implementation-in-python/
