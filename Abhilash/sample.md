@@ -1,6 +1,8 @@
 
 PageRank (PR) is an algorithm used by Google Search to rank websites in their search engine is used to find out the importance of a page to estimate how good a website is.
 
+![](https://github.com/AbhiRam0099/PyFlink-G05/blob/main/Abhilash/pagerank-algo-image.PNG)
+
 It is not the only algorithm used by Google to order search engine results.
 In this topic I will explain
 
