@@ -40,7 +40,7 @@ The PageRank algorithm outputs a probability distribution used to represent the 
 
 ## Anu Teja Gunda
 
-I have added the reference Links for the content and examples we used in this repository
+I have added the group image and reference Links for the content and examples we used in this repository
 
 ## JayaShankar Mangina
 
