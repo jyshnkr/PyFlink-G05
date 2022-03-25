@@ -1,7 +1,7 @@
 # PyFlink-G05
 
 # Team Members
-| Team Member Name         | Repo Link
+| Team Member Name         | WorkSpace Link
 | -------------------------|-------------------------|
 | 1. JayaShankar Mangina   |https://github.com/jyshnkr/PyFlink-G05/tree/main/JayaShankar                        |
 | 2. Pariveshita Thota     |https://github.com/jyshnkr/PyFlink-G05/tree/main/Pariveshita                         |
