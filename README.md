@@ -16,6 +16,14 @@
                          
 A Big data project to develop Google Page Rank System using Apache Flink with Python.
 
+## 1. Page rank
+
+PageRank (PR) is an algorithm used by Google Search to rank websites in their search engine results. PageRank works by counting the number and quality of links to a page to determine a rough estimate of how important the website is. The underlying assumption is that more important websites are likely to receive more links from other websites.
+
+## 2. Algorithm Explanation:
+
+The PageRank algorithm outputs a probability distribution used to represent the likelihood that a person randomly clicking on links will arrive at any particular page. PageRank can be calculated for collections of documents of any size. It is assumed in several research papers that the distribution is evenly divided among all documents in the collection at the beginning of the computational process. The PageRank computations require several passes, called “iterations”, through the collection to adjust approximate PageRank values to more closely reflect the theoretical true value.
+
 # Contributor's Space
 
 ## Abhilash Ramavaram
@@ -26,6 +34,11 @@ A Big data project to develop Google Page Rank System using Apache Flink with Py
 
 ## Madhu Babu Arla
 
+I learned and researched about page rank and page rank algorithm, And posted the same.
+
 ## Pariveshita Thota
 
+
 ## Nandini Kandi
+
+I have initiated the wiki for our repository and created sub-pages namely contributions, work, issues, and also allocated sub-pages for every team member.
