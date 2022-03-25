@@ -105,7 +105,9 @@ This is how page rank is calculated at each iteration. In real world it iteratio
 
 # Contributor's Space
 
-## Abhilash Ramavaram
+## Abhilash Ramavaram 
+
+I have added Pagerank explanation in detail with an example 
 
 ## Anu Teja Gunda
 
