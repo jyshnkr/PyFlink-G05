@@ -38,4 +38,7 @@ I learned and researched about page rank and page rank algorithm, And posted the
 
 ## Pariveshita Thota
 
+
 ## Nandini Kandi
+
+I have initiated the wiki for our repository and created sub-pages namely contributions, work, issues, and also allocated sub-pages for every team member.
