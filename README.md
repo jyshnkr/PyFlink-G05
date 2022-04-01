@@ -139,7 +139,9 @@ I have added the group image and reference Links for the content and examples we
 
 ## JayaShankar Mangina
 
-
+1. I have added table in README and allocated space for contributor's workspace links
+2. Added Contributor's space in README where the contributors can add their work & contributions.
+3. Moderated the content on README and made necessary changes.
 
 ## Madhu Babu Arla
 
