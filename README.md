@@ -10,7 +10,7 @@
 | 5. Sai Naga Anu Teja Gunda |https://github.com/jyshnkr/PyFlink-G05/tree/main/Anutej                      |   
 | 6. Nandini Kandi           |https://github.com/jyshnkr/PyFlink-G05/tree/main/Nandini                     |
 
-![GroupCollage](https://user-images.githubusercontent.com/77635770/160168682-61663fb8-2c84-4ed7-8c64-f7e6310d3474.jpeg)
+<img src="https://user-images.githubusercontent.com/77635770/160168682-61663fb8-2c84-4ed7-8c64-f7e6310d3474.jpeg" width="750" height="750">
 
 # Description                         
                          
@@ -39,9 +39,8 @@ The PageRank algorithm outputs a probability distribution used to represent the 
 
 PageRank (PR) is an algorithm used by Google Search to rank websites in their search engine is used to find out the importance of a page to estimate how good a website is.
 
-![](https://github.com/AbhiRam0099/PyFlink-G05/blob/main/Abhilash/pagerank-algo-image.PNG)
-
 It is not the only algorithm used by Google to order search engine results.
+
 In this topic we will explain
 
 #### What is PageRank?
@@ -72,9 +71,11 @@ d = Damping factor which can be set between 0 and 1.
 
 Let’s say we have three pages A, B and C. Where,
 
-1.     A linked to B and C
-2.     B linked to C
-3.     C linked to A
+> A linked to B and C
+
+> B linked to C
+
+> C linked to A
 
 #### Calculate Page Rank:
 
