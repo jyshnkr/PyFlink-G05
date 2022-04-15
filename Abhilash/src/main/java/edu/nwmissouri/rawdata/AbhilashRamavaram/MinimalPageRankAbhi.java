@@ -50,11 +50,9 @@ public class MinimalPageRankAbhi {
     PCollection<KV<String, String>> pCollectionKVList2 = batchuMapper1(p, "python.md", folder);
     PCollection<KV<String, String>> pCollectionKVList3 = batchuMapper1(p, "java.md", folder);
     PCollection<KV<String, String>> pCollectionKVList4 = batchuMapper1(p, "README.md", folder);
-    // PCollection<KV<String, String>> pCollectionKVList5 = batchuMapper1(p, "c.md",
-    // folder);
 
     PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pCollectionKVList1).and(pCollectionKVList2)
-        .and(pCollectionKVList3).and(pCollectionKVList4);// .and(pCollectionKVList5);
+        .and(pCollectionKVList3).and(pCollectionKVList4);
     PCollection<KV<String, String>> l = pCollList.apply(Flatten.<KV<String, String>>pCollections());
     PCollection<KV<String, Iterable<String>>> grouped = l.apply(GroupByKey.create());
     PCollection<String> pColLinkString = grouped
@@ -66,18 +64,15 @@ public class MinimalPageRankAbhi {
 
   private static PCollection<KV<String, String>> batchuMapper1(Pipeline p, String dataFile, String dataFolder) {
     String dataPath = dataFolder + "/" + dataFile;
-    // p.apply(TextIO.read().from("gs://apache-beam-samples/shakespeare/kinglear.txt"))
 
     PCollection<String> pcolInputLines = p.apply(TextIO.read().from(dataPath));
-    // .apply(Filter.by((String line) -> !line.isEmpty()))
-    // .apply(Filter.by((String line)->!line.equals(" ")))
+
     PCollection<String> pcolLinkLines = pcolInputLines.apply(Filter.by((String line) -> line.startsWith("[")));
     PCollection<String> pcolLinks = pcolLinkLines.apply(MapElements
         .into(TypeDescriptors.strings())
         .via(
             (String linkline) -> linkline.substring(linkline.indexOf("(") + 1, linkline.length() - 1)));
 
-    // from README.md to Key Value Pairs
     PCollection<KV<String, String>> pColKeyValuePairs = pcolLinks.apply(MapElements
 
         .into(
