@@ -1,4 +1,4 @@
-# GO: 4-Page Example Web
+# Python: 5-Page Example Web
 
 Links:
 

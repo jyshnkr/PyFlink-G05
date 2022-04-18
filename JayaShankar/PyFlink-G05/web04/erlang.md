@@ -1,4 +1,4 @@
-# JAVA: 4-Page Example Web
+# Erlang: 5-Page Example Web
 
 Links:
 
