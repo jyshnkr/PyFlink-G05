@@ -17,6 +17,7 @@
  */
 package edu.nwmissouri.groupOfFive;
 
+import java.io.File;
 import java.util.ArrayList;
 
 // beam-playground:
@@ -44,6 +45,7 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.beam.sdk.values.PCollection;
@@ -157,7 +159,7 @@ public class MinimalPageRankMadhuBabu {
 
 
    PCollection<KV<String,String>> ma4 = MadhuMapper01(p,"README.md",dataFolder);
-   
+
 
    PCollection<KV<String,String>> ma5 = MadhuMapper01(p,"react.md",dataFolder);
 
@@ -166,11 +168,24 @@ public class MinimalPageRankMadhuBabu {
 
     PCollection<KV<String, String>> mergedList = pCollectionList.apply(Flatten.<KV<String,String>>pCollections());
 
-    PCollection<KV<String, Iterable<String>>> gList =mergedList.apply(GroupByKey.create());
+    PCollection<KV<String, Iterable<String>>> gList =mergedList.apply(GroupByKey.<String, String>create());
 
+    PCollection<KV<String, RankedPage>> job2Input = gList.apply(ParDo.of(new Job1Finalizer()));
 
-    PCollection<String> pLinksString = gList.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
+    PCollection<String> pLinksString = job2Input.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
+    
+    PCollection<KV<String, RankedPage>> job2Output = null;
+
+   int iterations = 2;
+
+   for(int s=1; s <= iterations; s++){
+
+   }
+
+   PCollection<String> output = job2Output.apply(MapElements.into(TypeDescriptors.strings()).via(kv -> kv.toString()));
+
     pLinksString.apply(TextIO.write().to("MadhuPR"));  
+
     p.run().waitUntilFinish();
   }
 
@@ -195,4 +210,49 @@ public class MinimalPageRankMadhuBabu {
      .via((String outLink) -> KV.of(filename,outLink)));
     return pColKVPairs;
   }
+
+  /**
+ * Run one iteration of the Job 2 Map-Reduce process
+ * Notice how the Input Type to Job 2.
+ * Matches the Output Type from Job 2.
+ * How important is that for an iterative process?
+ * 
+ * @param kvReducedPairs - takes a PCollection<KV<String, RankedPage>> with
+ *                       initial ranks.
+ * @return - returns a PCollection<KV<String, RankedPage>> with updated ranks.
+ */
+private static PCollection<KV<String, RankedPage>> runJob2Iteration(
+  PCollection<KV<String, RankedPage>> kvReducedPairs) {
+
+//    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
+
+// KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
+// KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
+// KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
+
+// PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
+//     .apply(GroupByKey.<String, RankedPage>create());
+
+// KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
+// KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
+// 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
+
+// PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
+
+// KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
+// python.md, 1.00000,1]}
+// KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
+
+PCollection<KV<String, RankedPage>> updatedOutput = null;
+return updatedOutput;
+}
+
+public static  void deleteFiles(){
+  final File file = new File("C:/Users/s542387/OneDrive - nwmissouri.edu/Documents/44517/PyFlink-G05/Madhu/PyFlink-G05");
+  for (File f : file.listFiles()){
+    if(f.getName().startsWith("Madhu")){
+      f.delete();
+    }
+  }
+}
 }
