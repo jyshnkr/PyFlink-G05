@@ -46,6 +46,7 @@ import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
 import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
@@ -133,15 +134,30 @@ public class MinimalPageRankJayaShankar {
    PCollection<KV<String,String>> js4 = JayaShankarManginaMapper01(p,"README.md",dataFolder);
 
    PCollection<KV<String,String>> js5 = JayaShankarManginaMapper01(p,"erlang.md",dataFolder);
+
+
+
    
    PCollectionList<KV<String, String>> pCollectionList = PCollectionList.of(js1).and(js2).and(js3).and(js4).and(js5);
   
    PCollection<KV<String, String>> mergedList = pCollectionList.apply(Flatten.<KV<String,String>>pCollections());
 
-   PCollection<KV<String, Iterable<String>>> groupedList =mergedList.apply(GroupByKey.create());
+   PCollection<KV<String, Iterable<String>>> groupedList =mergedList.apply(GroupByKey.<String, String>create());
+
+   PCollection<KV<String, RankedPage>> job2Input = groupedList.apply(ParDo.of(new Job1Finalizer()));
   
-   PCollection<String> pLinksString = groupedList.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
+   PCollection<String> pLinksString = job2Input.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
    
+   PCollection<KV<String, RankedPage>> job2Output = null;
+   
+   int iterations = 2;
+   
+   for(int s=1; s <= iterations; s++){
+
+   }
+
+   PCollection<String> output = job2Output.apply(MapElements.into(TypeDescriptors.strings()).via(kv -> kv.toString()));
+
    pLinksString.apply(TextIO.write().to("JayaShankarPR"));  
    
    p.run().waitUntilFinish();
