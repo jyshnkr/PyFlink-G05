@@ -259,7 +259,7 @@ return updatedOutput;
 }
 
 public static  void deleteFiles(){
-  final File file = new File("./");
+  final File file = new File("C:/Users/S542044/Documents/44517/PyFlink-G05/JayaShankar/PyFlink-G05");
   for (File f : file.listFiles()){
     if(f.getName().startsWith("JayaShankar")){
       f.delete();
