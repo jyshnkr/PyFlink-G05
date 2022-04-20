@@ -17,6 +17,7 @@
  */
 package edu.nwmissouri.groupOfFive;
 
+import java.io.File;
 import java.util.ArrayList;
 
 // beam-playground:
@@ -115,6 +116,43 @@ public class MinimalPageRankJayaShankar {
     }
   }
 
+  static class Job2Mapper extends DoFn<KV<String, RankedPage>, KV<String, RankedPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPage>>, KV<String, RankedPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+    }
+  }
+
+
   public static void main(String[] args) {
     
     PipelineOptions options = PipelineOptionsFactory.create();
@@ -148,6 +186,9 @@ public class MinimalPageRankJayaShankar {
   
    PCollection<String> pLinksString = job2Input.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
    
+
+
+
    PCollection<KV<String, RankedPage>> job2Output = null;
    
    int iterations = 2;
@@ -180,4 +221,49 @@ public class MinimalPageRankJayaShankar {
     
     return pColKVPairs;
   }
+
+  /**
+ * Run one iteration of the Job 2 Map-Reduce process
+ * Notice how the Input Type to Job 2.
+ * Matches the Output Type from Job 2.
+ * How important is that for an iterative process?
+ * 
+ * @param kvReducedPairs - takes a PCollection<KV<String, RankedPage>> with
+ *                       initial ranks.
+ * @return - returns a PCollection<KV<String, RankedPage>> with updated ranks.
+ */
+private static PCollection<KV<String, RankedPage>> runJob2Iteration(
+  PCollection<KV<String, RankedPage>> kvReducedPairs) {
+
+//    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
+
+// KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
+// KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
+// KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
+
+// PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
+//     .apply(GroupByKey.<String, RankedPage>create());
+
+// KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
+// KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
+// 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
+
+// PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
+
+// KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
+// python.md, 1.00000,1]}
+// KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
+
+PCollection<KV<String, RankedPage>> updatedOutput = null;
+return updatedOutput;
+}
+
+public static  void deleteFiles(){
+  final File file = new File("./");
+  for (File f : file.listFiles()){
+    if(f.getName().startsWith("JayaShankar")){
+      f.delete();
+    }
+  }
+}
 }
