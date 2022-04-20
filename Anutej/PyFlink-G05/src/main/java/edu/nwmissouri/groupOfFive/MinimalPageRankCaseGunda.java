@@ -60,7 +60,7 @@ import org.apache.beam.sdk.values.PCollectionList;
  *
  * <pre>
  *   1. Reading data from text files
- *   2. Specifying 'inline' transforms
+ *   2. Specifying 'inline' transformssx
  *   3. Counting items in a PCollection
  *   4. Writing data to text files
  * </pre>
