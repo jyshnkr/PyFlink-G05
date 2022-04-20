@@ -17,6 +17,8 @@
  */
 package edu.nwmissouri.groupOfFive;
 
+import java.util.ArrayList;
+
 // beam-playground:
 //   name: MinimalWordCount
 //   description: An example that counts words in Shakespeare's works.
@@ -29,11 +31,14 @@ package edu.nwmissouri.groupOfFive;
 //     - Core Transforms
 
 import java.util.Arrays;
+import java.util.Collection;
+
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Count;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
@@ -72,6 +77,69 @@ import org.apache.beam.sdk.values.PCollectionList;
  */
 public class MinimalPageRankMadhuBabu {
 
+  /**
+   * DoFn Job1Finalizer takes KV(String, String List of outlinks) and transforms
+   * the value into our custom RankedPage Value holding the page's rank and list
+   * of voters.
+   * 
+   * The output of the Job1 Finalizer creates the initial input into our
+   * iterative Job 2.
+   */
+  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+    }
+  }
+
+  static class Job2Mapper extends DoFn<KV<String, RankedPage>, KV<String, RankedPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPage>>, KV<String, RankedPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankedPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+    }
+  }
+
+
   public static void main(String[] args) {
     PipelineOptions options = PipelineOptionsFactory.create();
 
@@ -89,6 +157,7 @@ public class MinimalPageRankMadhuBabu {
 
 
    PCollection<KV<String,String>> ma4 = MadhuMapper01(p,"README.md",dataFolder);
+   
 
    PCollection<KV<String,String>> ma5 = MadhuMapper01(p,"react.md",dataFolder);
 
