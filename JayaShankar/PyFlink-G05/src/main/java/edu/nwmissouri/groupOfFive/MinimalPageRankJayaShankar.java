@@ -35,23 +35,23 @@ import java.util.ArrayList;
 
 import java.util.Arrays;
 import java.util.Collection;
-
+import java.util.ArrayList;
+import java.io.File;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.GroupByKey;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
+import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
-import org.apache.beam.sdk.values.PDone;
 import org.apache.beam.sdk.values.TypeDescriptors;
 
 /**
@@ -124,6 +124,7 @@ public class MinimalPageRankJayaShankar {
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
       }
+
       ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
       for (String voterName : element.getValue()) {
         if (!voterName.isEmpty()) {
@@ -172,36 +173,35 @@ public class MinimalPageRankJayaShankar {
    PCollection<KV<String,String>> js4 = JayaShankarManginaMapper01(p,"README.md",dataFolder);
 
    PCollection<KV<String,String>> js5 = JayaShankarManginaMapper01(p,"erlang.md",dataFolder);
-
-
-
    
-   PCollectionList<KV<String, String>> pCollectionList = PCollectionList.of(js1).and(js2).and(js3).and(js4).and(js5);
+   PCollectionList<KV<String, String>> PColKVPairList = PCollectionList.of(js1).and(js2)
+   .and(js3).and(js4).and(js5);
+
+PCollection<KV<String, String>> PCMergeList = PColKVPairList.apply(Flatten.<KV<String, String>>pCollections());
+
+PCollection<KV<String, Iterable<String>>> PCGrpList =PCMergeList.apply(GroupByKey.create());
+
+
+PCollection<String> PColLink = PCGrpList.apply(
+   MapElements.into(
+       TypeDescriptors.strings())
+       .via((myMergeLstout) -> myMergeLstout.toString()));
   
-   PCollection<KV<String, String>> mergedList = pCollectionList.apply(Flatten.<KV<String,String>>pCollections());
+   // By default, it will write to a set of files with names like wordcounts-00001-of-00005
+   //longLinkLines.apply(TextIO.write().to("pageRankAneela"));
+   PColLink.apply(TextIO.write().to("JayaShankarPR"));
 
-   PCollection<KV<String, Iterable<String>>> groupedList =mergedList.apply(GroupByKey.<String, String>create());
-
-   PCollection<KV<String, RankedPage>> job2Input = groupedList.apply(ParDo.of(new Job1Finalizer()));
-  
-   PCollection<String> pLinksString = job2Input.apply(MapElements.into(TypeDescriptors.strings()).via((mergeOut)->mergeOut.toString()));
+p.run().waitUntilFinish();
    
-
-
-
-   PCollection<KV<String, RankedPage>> job2Output = null;
+  //  PCollection<KV<String, RankedPage>> job2Output = null;
    
-   int iterations = 2;
+  //  int iterations = 2;
    
-   for(int s=1; s <= iterations; s++){
+  //  for(int s=1; s <= iterations; s++){
 
-   }
+  //  }
 
-   PCollection<String> output = job2Output.apply(MapElements.into(TypeDescriptors.strings()).via(kv -> kv.toString()));
-
-   pLinksString.apply(TextIO.write().to("JayaShankarPR"));  
-   
-   p.run().waitUntilFinish();
+  //  PCollection<String> output = job2Output.apply(MapElements.into(TypeDescriptors.strings()).via(kv -> kv.toString()));
   
   }
 
@@ -259,7 +259,7 @@ return updatedOutput;
 }
 
 public static  void deleteFiles(){
-  final File file = new File("C:/Users/S542044/Documents/44517/PyFlink-G05/JayaShankar/PyFlink-G05");
+  final File file = new File("./");
   for (File f : file.listFiles()){
     if(f.getName().startsWith("JayaShankar")){
       f.delete();
