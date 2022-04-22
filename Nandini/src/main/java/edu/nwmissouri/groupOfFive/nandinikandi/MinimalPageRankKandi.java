@@ -58,98 +58,45 @@ public class MinimalPageRankKandi {
 
   static class Job2Mapper extends DoFn<KV<String, RankedPage>, KV<String, RankedPage>> {
     @ProcessElement
-    public void processElement(@Element KV<String, Iterable<String>> element,
+    public void processElement(@Element KV<String, RankedPage> element,
         OutputReceiver<KV<String, RankedPage>> receiver) {
-      Integer contributorVotes = 0;
-      if (element.getValue() instanceof Collection) {
-        contributorVotes = ((Collection<String>) element.getValue()).size();
+      Integer votes = 0;
+      ArrayList<VotingPage> voters = element.getValue().getVoters();
+      if (voters instanceof Collection) {
+        votes = ((Collection<VotingPage>)voters).size();
       }
-      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
-      for (String voterName : element.getValue()) {
-        if (!voterName.isEmpty()) {
-          voters.add(new VotingPage(voterName, contributorVotes));
-        }
+      for(VotingPage vp : voters) {
+        String contributingPageName = element.getKey();
+        Double contributingPageRank = element.getValue().getRank();
+        VotingPage contributor = new VotingPage(contributingPageName, contributingPageRank, votes);
+        ArrayList<VotingPage> arr = new  ArrayList<VotingPage>();
+        arr.add(contributor);
+        receiver.output(KV.of(vp.getNameIn(), new RankedPage(contributingPageName, contributingPageRank, arr)));
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
     }
   }
 
   static class Job2Updater extends DoFn<KV<String, Iterable<RankedPage>>, KV<String, RankedPage>> {
     @ProcessElement
-    public void processElement(@Element KV<String, Iterable<String>> element,
+    public void processElement(@Element KV<String, Iterable<RankedPage>> element,
         OutputReceiver<KV<String, RankedPage>> receiver) {
-      Integer contributorVotes = 0;
-      if (element.getValue() instanceof Collection) {
-        contributorVotes = ((Collection<String>) element.getValue()).size();
-      }
-      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
-      for (String voterName : element.getValue()) {
-        if (!voterName.isEmpty()) {
-          voters.add(new VotingPage(voterName, contributorVotes));
+      String contributingPageName = element.getKey();
+      Double dampingFactor = 0.85;
+      Double updatedRank = (1 - dampingFactor);
+      ArrayList<VotingPage> newVoters = new ArrayList<VotingPage>();
+      for (RankedPage pg : element.getValue()) {
+        if (pg != null) {
+          for (VotingPage vp : pg.getVoters()){
+            newVoters.add(vp);
+            updatedRank += (dampingFactor) * vp.getRank() / (double) vp.getVotes();
+          }
         }
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+      receiver.output(KV.of(contributingPageName, new RankedPage(contributingPageName, updatedRank, newVoters)));
     }
   }
 
-  public static void main(String[] args) {
 
-      PipelineOptions myOptions = PipelineOptionsFactory.create();
-  
-      Pipeline p = Pipeline.create(myOptions);
-  
-      String folder="web04";
-      PCollection<KV<String,String>> pcolKV1 = kandiMapper1(p,"go.md",folder);
-      PCollection<KV<String,String>> pcolKV2 = kandiMapper1(p,"python.md",folder);
-      PCollection<KV<String,String>> pcolKV3 = kandiMapper1(p,"java.md",folder);
-      PCollection<KV<String,String>> pcolKV4 = kandiMapper1(p,"README.md",folder);
-      PCollection<KV<String,String>> pcolKV5 = kandiMapper1(p,"c.md",folder);
-              
-      PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pcolKV1).and(pcolKV2).and(pcolKV3).and(pcolKV4).and(pcolKV5);
-      PCollection<KV<String, String>> mergedKV = pCollList.apply(Flatten.<KV<String,String>>pCollections());
-      // PCollection<KV<String, Iterable<String>>> grouped = mergeList.apply(GroupByKey.create());
-      // Group by Key to get a single record for each page
-      PCollection<KV<String, Iterable<String>>> kvStringReducedPairs = mergedKV.apply(GroupByKey.<String, String>create());
-
-      // Convert to a custom Value object (RankedPage) in preparation for Job 2
-      PCollection<KV<String, RankedPage>> job2in = kvStringReducedPairs.apply(ParDo.of(new Job1Finalizer()));
-      // END JOB 1
-      // ========================================
-      // KV{python.md, python.md, 1.00000, 0, [README.md, 1.00000,1]}
-      // KV{go.md, go.md, 1.00000, 0, [README.md, 1.00000,1]}
-      // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,3, java.md, 1.00000,3,
-      // python.md, 1.00000,3]}
-      // ========================================
-      // BEGIN ITERATIVE JOB 2
-
-      PCollection<KV<String, RankedPage>> job2out = null; 
-      int iterations = 2;
-      for (int i = 1; i <= iterations; i++) {
-        // use job2in to calculate job2 out
-        // .... write code here
-        // update job2in so it equals the new job2out
-        // ... write code here
-      }
-
-      // END ITERATIVE JOB 2
-      // ========================================
-      // after 40 - output might look like this:
-      // KV{java.md, java.md, 0.69415, 0, [README.md, 1.92054,3]}
-      // KV{python.md, python.md, 0.69415, 0, [README.md, 1.92054,3]}
-      // KV{README.md, README.md, 1.91754, 0, [go.md, 0.69315,1, java.md, 0.69315,1,
-      // python.md, 0.69315,1]}
-
-      // Map KVs to strings before outputting
-      PCollection<String> output = job2out.apply(MapElements.into(
-          TypeDescriptors.strings())
-          .via(kv -> kv.toString()));
-
-      // Write from Beam back out into the real world
-      output.apply(TextIO.write().to("kandiOutput"));  
-      p.run().waitUntilFinish();
-          
-    }
-  
   private static PCollection<KV<String, String>> kandiMapper1(Pipeline p,String dataFile ,String dataFolder ) {
     String dataPath = dataFolder + "/" + dataFile;
     
@@ -183,43 +130,100 @@ public class MinimalPageRankKandi {
  * Matches the Output Type from Job 2.
  * How important is that for an iterative process?
  * 
- * @param kvReducedPairs - takes a PCollection<KV<String, RankedPage>> with
- *                       initial ranks.
+ * @param kvReducedPairs - takes a PCollection<KV<String, RankedPage>> with initial ranks.
  * @return - returns a PCollection<KV<String, RankedPage>> with updated ranks.
  */
   private static PCollection<KV<String, RankedPage>> runJob2Iteration(
     PCollection<KV<String, RankedPage>> kvReducedPairs) {
   
-  //    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
+    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
 
-  // KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
-  // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
-  // KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
+    // KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
+    // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
+    // KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
 
-  // PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
-  //     .apply(GroupByKey.<String, RankedPage>create());
+    PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
+        .apply(GroupByKey.<String, RankedPage>create());
 
-  // KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
-  // KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
-  // 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
+    // KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
+    // KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
+    // 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
 
-  // PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
+    PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
 
-  // KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
-  // python.md, 1.00000,1]}
-  // KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
+    // KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
+    // python.md, 1.00000,1]}
+    // KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
 
-  PCollection<KV<String, RankedPage>> updatedOutput = null;
-  return updatedOutput;
+    return updatedOutput;
 }
 
   public static  void deleteFiles(){
     final File file = new File("./");
     for (File f : file.listFiles()){
-      if(f.getName().startsWith("kandi")){
+      if(f.getName().startsWith("kandiOutput")){
         f.delete();
       }
     }
+  }
+
+  public static void main(String[] args) {
+
+    PipelineOptions myOptions = PipelineOptionsFactory.create();
+
+    Pipeline p = Pipeline.create(myOptions);
+
+    String folder="web04";
+    PCollection<KV<String,String>> pcolKV1 = kandiMapper1(p,"go.md",folder);
+    PCollection<KV<String,String>> pcolKV2 = kandiMapper1(p,"python.md",folder);
+    PCollection<KV<String,String>> pcolKV3 = kandiMapper1(p,"java.md",folder);
+    PCollection<KV<String,String>> pcolKV4 = kandiMapper1(p,"README.md",folder);
+    PCollection<KV<String,String>> pcolKV5 = kandiMapper1(p,"c.md",folder);
+            
+    PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pcolKV1).and(pcolKV2).and(pcolKV3).and(pcolKV4).and(pcolKV5);
+    PCollection<KV<String, String>> mergedKV = pCollList.apply(Flatten.<KV<String,String>>pCollections());
+
+    // Group by Key to get a single record for each page
+    PCollection<KV<String, Iterable<String>>> kvStringReducedPairs = mergedKV.apply(GroupByKey.<String, String>create());
+
+    // Convert to a custom Value object (RankedPage) in preparation for Job 2
+    PCollection<KV<String, RankedPage>> job2in = kvStringReducedPairs.apply(ParDo.of(new Job1Finalizer()));
+    
+    // END JOB 1
+    // ========================================
+    // KV{python.md, python.md, 1.00000, 0, [README.md, 1.00000,1]}
+    // KV{go.md, go.md, 1.00000, 0, [README.md, 1.00000,1]}
+    // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,3, java.md, 1.00000,3,
+    // python.md, 1.00000,3]}
+    // ========================================
+    // BEGIN ITERATIVE JOB 2
+    
+    PCollection<KV<String, RankedPage>> job2out = null; 
+    int iterations = 20;
+    for (int i = 1; i <= iterations; i++) {
+      // use job2in to calculate job2 out
+      job2out = runJob2Iteration(job2in);
+      // update job2in so it equals the new job2out
+      job2in = job2out;
+    }
+
+    // END ITERATIVE JOB 2
+    // ========================================
+    // after 40 - output might look like this:
+    // KV{java.md, java.md, 0.69415, 0, [README.md, 1.92054,3]}
+    // KV{python.md, python.md, 0.69415, 0, [README.md, 1.92054,3]}
+    // KV{README.md, README.md, 1.91754, 0, [go.md, 0.69315,1, java.md, 0.69315,1,
+    // python.md, 0.69315,1]}
+
+    // Map KVs to strings before outputting
+    PCollection<String> output = job2out.apply(MapElements.into(
+        TypeDescriptors.strings())
+        .via(kv -> kv.toString()));
+
+    // Write from Beam back out into the real world
+    output.apply(TextIO.write().to("kandiOutput"));  
+    p.run().waitUntilFinish();
+        
   }
 
 }

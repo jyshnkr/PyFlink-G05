@@ -2,31 +2,48 @@ package edu.nwmissouri.groupOfFive.nandinikandi;
 
 public class VotingPage {
 
-    public String voterName;
-    public Integer contributorVotes;
+    public String nameIn = "'unknown.md";
+    public Double rank = 1.0;
+    public Integer votes = 0;
 
-    public VotingPage(String voterName, Integer contributorVotes) {
-        this.voterName = voterName;
-        this.contributorVotes = contributorVotes;
+    public VotingPage(String nameIn, Integer contributorVotes) {
+        this.nameIn = nameIn;
+        this.votes = contributorVotes;
     }
 
-    public String getVoterName(){
-        return voterName;
+    public VotingPage(String contributingPageName, Double contributingPageRank, Integer votes) {
+        this.nameIn = contributingPageName;
+        this.rank = contributingPageRank;
+        this.votes = votes;
     }
 
-    public  Integer getContributorVotes(){
-        return contributorVotes;
+    public String getNameIn(){
+        return nameIn;
     }
 
-    public void setVoterName(String voterName){
-        this.voterName = voterName;
+    public void setNameIn(String nameIn){
+        this.nameIn = nameIn;
     }
 
-    public void setContributorVotes(Integer contributorVotes ){
-        this.contributorVotes = contributorVotes;
+    public  Double getRank(){
+        return rank;
     }
+    
+    public void setRank(Double rank ){
+        this.rank = rank;
+    }
+
+    public  Integer getVotes(){
+        return votes;
+    }
+
+    public void setVotes(Integer votes ){
+        this.votes = votes;
+    }
+
+    @Override
+    public String toString(){
+        return String.format("%s, %.5s, %s", this.nameIn, this.rank, this.votes);
+    } 
 
 }
-
-
-  
