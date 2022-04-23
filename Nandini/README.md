@@ -1,4 +1,5 @@
-#word-count-beam
+## This is Nandini Kandi. 
+#MinimalPageRankBean
 
 Java Quickstart for Apache Beam
 
@@ -16,22 +17,36 @@ mvn archetype:generate `
  -D archetypeGroupId=org.apache.beam `
  -D archetypeArtifactId=beam-sdks-java-maven-archetypes-examples `
  -D archetypeVersion=2.36.0 `
- -D groupId=org.example `
- -D artifactId=word-count-beam `
+ -D groupId=edu.nwmsu.bigdata `
+ -D artifactId=page-rank-sec02-grp05 `
  -D version="0.1" `
- -D package=org.apache.beam.examples `
+ -D package=edu.nwmissouri.groupOfFive.nandinikandi `
  -D interactiveMode=false`
-```
-
-## Execute using DirectRunner
-
-```PowerShell
-mvn compile exec:java -D exec.mainClass=org.apache.beam.examples.WordCount `
- -D exec.args="--inputFile=sample.txt --output=counts" -P direct-runner
 ```
 
 ## Execute PR Quick Start
 
 ```PowerShell
-mvn compile exec:java -D exec.mainClass=org.apache.beam.examples.MinimalPageRankKandi 
+mvn compile exec:java -D exec.mainClass=edu.nwmissouri.groupOfFive.nandinikandi.MinimalPageRankKandi
 ```
+
+### Link to My WIKI page
+https://github.com/jyshnkr/PyFlink-G05/wiki/Nandini-Kandi 
+
+### Link to My Group's repo
+https://github.com/jyshnkr/PyFlink-G05 
+
+### Link to MyCode folder
+https://github.com/jyshnkr/PyFlink-G05/tree/main/Nandini
+
+### Link to my minimalPageRank.java
+https://github.com/jyshnkr/PyFlink-G05/blob/main/Nandini/src/main/java/edu/nwmissouri/groupOfFive/nandinikandi/MinimalPageRankKandi.java 
+
+### Link to my RankedPage.java
+https://github.com/jyshnkr/PyFlink-G05/blob/main/Nandini/src/main/java/edu/nwmissouri/groupOfFive/nandinikandi/RankedPage.java 
+
+### Link to my VotingPage.java
+https://github.com/jyshnkr/PyFlink-G05/blob/main/Nandini/src/main/java/edu/nwmissouri/groupOfFive/nandinikandi/VotingPage.java  
+
+### Work done by me
+I have implemented Job1Finalizer, Job2Mapper, Job2Updater, runJob2Iteration, deleteFiles. But getting an error while compiling. 
