@@ -1,5 +1,5 @@
 ## This is Nandini Kandi. 
-#MinimalPageRankBean
+# MinimalPageRankBeam
 
 Java Quickstart for Apache Beam
 
