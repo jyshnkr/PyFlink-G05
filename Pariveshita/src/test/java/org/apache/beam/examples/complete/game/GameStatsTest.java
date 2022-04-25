@@ -21,10 +21,7 @@ package org.apache.beam.examples.complete.game;
 //   name: GameStatsTest
 //   description: Unit-test for the GameStats example.
 //   multifile: false
-//   context_line: 51
-
 //   pipeline_options:
-
 //   categories:
 //     - Testing
 //     - Filtering
