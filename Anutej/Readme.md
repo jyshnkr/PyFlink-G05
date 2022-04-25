@@ -30,6 +30,8 @@ mvn archetype:generate `
 ```PowerShell
 mvn compile exec:java -D exec.mainClass=edu.nwmissouri.groupOfFive.nandinikandi.MinimalPageRankKandi
 ```
+### Link to My Commits page
+https://github.com/jyshnkr/PyFlink-G05/commits?author=GUNDAANUTEJ
 
 ### Link to My WIKI page
 https://github.com/jyshnkr/PyFlink-G05/wiki/Sai-Naga-Anu-Teja-Gunda 
