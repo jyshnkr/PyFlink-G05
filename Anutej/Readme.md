@@ -50,4 +50,5 @@ https://github.com/jyshnkr/PyFlink-G05/blob/main/Anutej/PyFlink-G05/src/main/jav
 https://github.com/jyshnkr/PyFlink-G05/blob/main/Anutej/PyFlink-G05/src/main/java/edu/nwmissouri/groupOfFive/VotingPage.java  
 
 ### Work done by me
-I have implemented Job1Finalizer, Job2Mapper, Job2Updater, runJob2Iteration, deleteFiles. Working on some errors.
+* I have added the group image and reference Links for the content and examples we used in this repository
+* I have implemented Job1Finalizer, Job2Mapper, Job2Updater, runJob2Iteration, deleteFiles. Working on some errors.
