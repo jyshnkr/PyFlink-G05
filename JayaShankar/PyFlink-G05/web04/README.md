@@ -54,4 +54,4 @@ Improve until the pages:
 - can have images
 
 ## For Reference:
-```mvn compile exec:java -D exec.mainClass=org.apache.beam.examples.MinimalPageRankJayaShankar```
+```mvn compile exec:java -D exec.mainClass=edu.nwmissouri.groupOfFive.MinimalPageRankJayaShankar```
