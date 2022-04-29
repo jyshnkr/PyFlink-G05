@@ -17,6 +17,7 @@
  */
 package edu.nwmissouri.groupOfFive;
 
+import java.io.File;
 import java.util.ArrayList;
 
 // beam-playground:
@@ -69,7 +70,7 @@ public class MinimalPageRankPariveshita {
           voters.add(new ThotaVotingPage(voterName, contributorVotes));
         }
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+      receiver.output(KV.of(element.getKey(), new ThotaRankedPage(element.getKey(), voters)));
     }
   }
 
@@ -82,12 +83,12 @@ public class MinimalPageRankPariveshita {
       if(voters instanceof Collection){
          votes = ((Collection<ThotaVotingPage>)voters).size();
       }
-      for(VotingPage vp: voters){
+      for(ThotaVotingPage vp: voters){
         String pageName = vp.getName();
         Double pageRank = vp.getRank();
         String contributingPageName = element.getKey();
         Double contributingPageRank = element.getValue().getRank();
-        VotingPage contributor = new VotingPage(contributingPageName, contributingPageRank, votes);
+        ThotaVotingPage contributor = new ThotaVotingPage(contributingPageName, contributingPageRank, votes);
         ArrayList<ThotaVotingPage> arr = new ArrayList<ThotaVotingPage>();
         arr.add(contributor);
         receiver.output(KV.of(vp.getName(), new ThotaRankedPage(pageName,pageRank,arr)));
@@ -95,7 +96,7 @@ public class MinimalPageRankPariveshita {
     }
 }
 
-static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<String, RankedPage>> {
+static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<String, ThotaRankedPage>> {
   @ProcessElement
   public void processElement(@Element KV<String, Iterable<ThotaRankedPage>> element,
       OutputReceiver<KV<String, ThotaRankedPage>> receiver) {
@@ -104,7 +105,7 @@ static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<
   Double dampingFactor = 0.85;
   Double updatedRank = (1-dampingFactor);
   ArrayList<ThotaVotingPage> newVoters = new ArrayList<ThotaVotingPage>();
-  for(RankedPage pg : rankedPages){
+  for(ThotaRankedPage pg : rankedPages){
     if(pg != null){
       for(ThotaVotingPage vPage : pg.getVoters()){
         newVoters.add(vPage);
@@ -112,7 +113,7 @@ static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<
       }
     }
   }
-  receiver.output(KV.of(page, new RankedPage(page, updatedRank, newVoters)));
+  receiver.output(KV.of(page, new ThotaRankedPage(page, updatedRank, newVoters)));
   }
 }
 
@@ -134,7 +135,7 @@ static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<
    
     PCollection<KV<String,String>> p4 =  PariveshitaMapper01(p,"README.md",dataFolder);
 
-    PCollection<KV<String,String>> p5 =  PariveshitaMapper01(p,"erlang.md",dataFolder);
+    PCollection<KV<String,String>> p5 =  PariveshitaMapper01(p,"cobalt.md",dataFolder);
 
 
 
@@ -154,15 +155,15 @@ static class Job2Updater extends DoFn<KV<String, Iterable<ThotaRankedPage>>, KV<
    int iterations = 60;
    for(int i=0; i<iterations; i++){
      if(i==0){
-       mappedKVPairs = job2in.apply(ParDo.of(new Job2Mapper()));
+       mappedKVPairs = job2Input.apply(ParDo.of(new Job2Mapper()));
      }else{
-       mappedKVPairs = newUpdatedOutput.apply(ParDo.of(new Job2Mapper()));
+       mappedKVPairs = job2Output.apply(ParDo.of(new Job2Mapper()));
      }
      PCollection<KV<String, Iterable<ThotaRankedPage>>> reducedKVPairs = mappedKVPairs.apply(GroupByKey.<String,ThotaRankedPage>create());
-     newUpdatedOutput = reducedKVPairs.apply(ParDo.of(new Job2Updater()));
+     job2Output = reducedKVPairs.apply(ParDo.of(new Job2Updater()));
    }
 
-   PCollection<String> pLinksString = newUpdatedOutput.apply(
+   PCollection<String> pLinksString = job2Output.apply(
    MapElements.into(
        TypeDescriptors.strings())
        .via((myMergeLstout) -> myMergeLstout.toString()));

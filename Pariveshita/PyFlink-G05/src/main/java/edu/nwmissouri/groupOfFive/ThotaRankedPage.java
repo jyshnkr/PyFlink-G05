@@ -1,18 +1,19 @@
 package edu.nwmissouri.groupOfFive;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class RankedPage implements Serializable{
+public class ThotaRankedPage implements Serializable{
 
     String name = "unknown.md";
     Double rank = 1.000;
     ArrayList<ThotaVotingPage> voters = new ArrayList<ThotaVotingPage>();
 
     ThotaRankedPage(String nameIn, ArrayList<ThotaVotingPage> votersIn) {
-        this.key = nameIn;
+        this.name = nameIn;
         this.voters = votersIn;
     }
-    ThotaRankedPage(String nameIn,Double rankIn, ArrayList<VarshithVotingPage> votersIn){
+    ThotaRankedPage(String nameIn,Double rankIn, ArrayList<ThotaVotingPage> votersIn){
         this.name = nameIn;
         this.voters = votersIn;
         this.rank = rankIn;
