@@ -17,6 +17,9 @@
  */
 package edu.nwmissouri.groupOfFive;
 
+import java.io.File;
+import java.util.ArrayList;
+
 // beam-playground:
 //   name: MinimalWordCount
 //   description: An example that counts words in Shakespeare's works.
@@ -29,11 +32,16 @@ package edu.nwmissouri.groupOfFive;
 //     - Core Transforms
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.io.File;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Count;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Filter;
 import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.Flatten;
@@ -60,7 +68,7 @@ import org.apache.beam.sdk.values.PCollectionList;
  *
  * <pre>
  *   1. Reading data from text files
- *   2. Specifying 'inline' transforms
+ *   2. Specifying 'inline' transformssx
  *   3. Counting items in a PCollection
  *   4. Writing data to text files
  * </pre>
@@ -71,6 +79,62 @@ import org.apache.beam.sdk.values.PCollectionList;
  * file service.
  */
 public class MinimalPageRankCaseGunda {
+
+  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankingPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankingPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankingPage(element.getKey(), voters)));
+    }
+  }
+
+  static class Job2Mapper extends DoFn<KV<String, RankingPage>, KV<String, RankingPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankingPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankingPage(element.getKey(), voters)));
+    }
+  }
+
+  static class Job2Updater extends DoFn<KV<String, Iterable<RankingPage>>, KV<String, RankingPage>> {
+    @ProcessElement
+    public void processElement(@Element KV<String, Iterable<String>> element,
+        OutputReceiver<KV<String, RankingPage>> receiver) {
+      Integer contributorVotes = 0;
+      if (element.getValue() instanceof Collection) {
+        contributorVotes = ((Collection<String>) element.getValue()).size();
+      }
+      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      for (String voterName : element.getValue()) {
+        if (!voterName.isEmpty()) {
+          voters.add(new VotingPage(voterName, contributorVotes));
+        }
+      }
+      receiver.output(KV.of(element.getKey(), new RankingPage(element.getKey(), voters)));
+    }
+  }
+
   public static void main(String[] args) {
 
     PipelineOptions options = PipelineOptionsFactory.create();
@@ -119,4 +183,39 @@ public class MinimalPageRankCaseGunda {
 
   }
 
+  private static PCollection<KV<String, RankingPage>> runJob2Iteration(
+  PCollection<KV<String, RankingPage>> kvReducedPairs) {
+
+//    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
+
+// KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
+// KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
+// KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
+
+// PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
+//     .apply(GroupByKey.<String, RankedPage>create());
+
+// KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
+// KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
+// 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
+
+// PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
+
+// KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
+// python.md, 1.00000,1]}
+// KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
+
+PCollection<KV<String, RankingPage>> updatedOutput = null;
+return updatedOutput;
+}
+
+public static  void deleteFiles(){
+  final File file = new File("./");
+  for (File f : file.listFiles()){
+    if(f.getName().startsWith("AnuTeja")){
+      f.delete();
+    }
+  }
+
+}
 }

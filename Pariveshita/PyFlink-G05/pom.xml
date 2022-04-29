@@ -20,6 +20,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  
   <groupId>edu.nwmsu.bigdata</groupId>
   <artifactId>PyFlink-G05</artifactId>
   <version>0.1</version>
@@ -27,6 +28,7 @@
   <packaging>jar</packaging>
 
   <properties>
+    
     <beam.version>2.37.0</beam.version>
 
     <bigquery.version>v2-rev20211129-1.32.1</bigquery.version>
@@ -231,12 +233,14 @@
           <artifactId>beam-runners-spark</artifactId>
           <version>${beam.version}</version>
           <scope>runtime</scope>
+          
           <exclusions>
             <exclusion>
               <groupId>org.slf4j</groupId>
               <artifactId>jul-to-slf4j</artifactId>
             </exclusion>
           </exclusions>
+        
         </dependency>
         <dependency>
           <groupId>org.apache.beam</groupId>
