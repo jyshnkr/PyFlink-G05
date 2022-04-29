@@ -49,4 +49,4 @@ https://github.com/jyshnkr/PyFlink-G05/blob/main/Nandini/src/main/java/edu/nwmis
 https://github.com/jyshnkr/PyFlink-G05/blob/main/Nandini/src/main/java/edu/nwmissouri/groupOfFive/nandinikandi/VotingPage.java  
 
 ### Work done by me
-I have implemented Job1Finalizer, Job2Mapper, Job2Updater, runJob2Iteration, deleteFiles. But getting an error while compiling. 
+I have implemented Job1Finalizer, Job2Mapper and Job2Updater classes. And added kandiMapper1(), runJob2Iteration(), deleteFiles() and main() methods to MinimalPageRankKandi. And got the expected output.
