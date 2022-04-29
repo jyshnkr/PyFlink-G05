@@ -211,8 +211,7 @@ PCollection<String> pLinksString = newUpdatedOutput.apply(
        TypeDescriptors.strings())
        .via((myMergeLstout) -> myMergeLstout.toString()));
   
-   // By default, it will write to a set of files with names like wordcounts-00001-of-00005
-   //longLinkLines.apply(TextIO.write().to("pageRankAneela"));
+
 pLinksString.apply(TextIO.write().to("JayaShankarPR"));
 p.run().waitUntilFinish();
 }
