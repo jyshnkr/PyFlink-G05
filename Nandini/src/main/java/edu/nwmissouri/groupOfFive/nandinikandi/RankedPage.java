@@ -22,15 +22,15 @@ public class RankedPage implements Serializable{
     }
 
     public String getNameIn(){
-        return nameIn;
+        return this.nameIn;
     }
 
     public  ArrayList<VotingPage> getVoters(){
-        return voters;
+        return this.voters;
     }
 
     public Double getRank(){
-        return rank;
+        return this.rank;
     }
 
     public void setRank(Double rank ){
@@ -47,7 +47,7 @@ public class RankedPage implements Serializable{
 
     @Override
     public String toString(){
-        return String.format("%s, %.5s, %s", this.nameIn, this.rank, this.voters.toString());
+        return String.format("%s, %.5f, %s", this.nameIn, this.rank, this.voters.toString());
     } 
 
 }
