@@ -66,12 +66,14 @@ public class MinimalPageRankKandi {
         votes = ((Collection<VotingPage>)voters).size();
       }
       for(VotingPage vp : voters) {
+        String pageName = vp.getNameIn();
+        Double pageRank = vp.getRank();
         String contributingPageName = element.getKey();
         Double contributingPageRank = element.getValue().getRank();
         VotingPage contributor = new VotingPage(contributingPageName, contributingPageRank, votes);
-        ArrayList<VotingPage> arr = new  ArrayList<VotingPage>();
-        arr.add(contributor);
-        receiver.output(KV.of(vp.getNameIn(), new RankedPage(contributingPageName, contributingPageRank, arr)));
+        ArrayList<VotingPage> arrVP = new  ArrayList<VotingPage>();
+        arrVP.add(contributor);
+        receiver.output(KV.of(vp.getNameIn(), new RankedPage(pageName, pageRank, arrVP)));
       }
     }
   }
@@ -81,10 +83,11 @@ public class MinimalPageRankKandi {
     public void processElement(@Element KV<String, Iterable<RankedPage>> element,
         OutputReceiver<KV<String, RankedPage>> receiver) {
       String contributingPageName = element.getKey();
+      Iterable<RankedPage> rankedPages = element.getValue();
       Double dampingFactor = 0.85;
       Double updatedRank = (1 - dampingFactor);
       ArrayList<VotingPage> newVoters = new ArrayList<VotingPage>();
-      for (RankedPage pg : element.getValue()) {
+      for (RankedPage pg : rankedPages) {
         if (pg != null) {
           for (VotingPage vp : pg.getVoters()){
             newVoters.add(vp);
@@ -101,7 +104,11 @@ public class MinimalPageRankKandi {
     String dataPath = dataFolder + "/" + dataFile;
     
     PCollection<String> pcolInputLines=p.apply(TextIO.read().from(dataPath));
-    PCollection<String> pcolLinkLines= pcolInputLines.apply(Filter.by((String line)->line.startsWith("[")));
+    PCollection<String> pcolLinkLines= pcolInputLines.apply(Filter.by((String line)->line.startsWith("[")))
+    .apply(
+      MapElements.into(TypeDescriptors.strings())
+          .via((String linkLine) -> linkLine.strip()));
+          
     PCollection<String> pcolLinks=pcolLinkLines.apply(MapElements
     .into(TypeDescriptors.strings())
     .via(
@@ -109,18 +116,12 @@ public class MinimalPageRankKandi {
     linkline.substring(linkline.indexOf("(")+1,linkline.length()-1)));
 
     // from README.md to Key Value Pairs
-    PCollection<KV<String,String>> pColKeyValuePairs=pcolLinks.apply(MapElements
-
-    .into(
-    TypeDescriptors.kvs(
-        TypeDescriptors.strings(),TypeDescriptors.strings()
+    PCollection<KV<String,String>> pColKeyValuePairs=pcolLinks.apply(
+      MapElements.into(
+        TypeDescriptors.kvs(
+          TypeDescriptors.strings(),TypeDescriptors.strings()
         )
-        )
-
-    .via(
-    outlink->KV.of(dataFile,outlink)
-
-    ));
+      ).via((String outlink) -> KV.of(dataFile,outlink)));
     return pColKeyValuePairs;    
   }
 
@@ -137,25 +138,11 @@ public class MinimalPageRankKandi {
     PCollection<KV<String, RankedPage>> kvReducedPairs) {
   
     PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
-
-    // KV{README.md, README.md, 1.00000, 0, [java.md, 1.00000,1]}
-    // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,1]}
-    // KV{java.md, java.md, 1.00000, 0, [README.md, 1.00000,3]}
-
     PCollection<KV<String, Iterable<RankedPage>>> reducedKVs = mappedKVs
         .apply(GroupByKey.<String, RankedPage>create());
-
-    // KV{java.md, [java.md, 1.00000, 0, [README.md, 1.00000,3]]}
-    // KV{README.md, [README.md, 1.00000, 0, [python.md, 1.00000,1], README.md,
-    // 1.00000, 0, [java.md, 1.00000,1], README.md, 1.00000, 0, [go.md, 1.00000,1]]}
-
     PCollection<KV<String, RankedPage>> updatedOutput = reducedKVs.apply(ParDo.of(new Job2Updater()));
-
-    // KV{README.md, README.md, 2.70000, 0, [java.md, 1.00000,1, go.md, 1.00000,1,
-    // python.md, 1.00000,1]}
-    // KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
-
     return updatedOutput;
+
 }
 
   public static  void deleteFiles(){
@@ -168,7 +155,7 @@ public class MinimalPageRankKandi {
   }
 
   public static void main(String[] args) {
-
+    deleteFiles();
     PipelineOptions myOptions = PipelineOptionsFactory.create();
 
     Pipeline p = Pipeline.create(myOptions);
@@ -178,9 +165,8 @@ public class MinimalPageRankKandi {
     PCollection<KV<String,String>> pcolKV2 = kandiMapper1(p,"python.md",folder);
     PCollection<KV<String,String>> pcolKV3 = kandiMapper1(p,"java.md",folder);
     PCollection<KV<String,String>> pcolKV4 = kandiMapper1(p,"README.md",folder);
-    PCollection<KV<String,String>> pcolKV5 = kandiMapper1(p,"c.md",folder);
             
-    PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pcolKV1).and(pcolKV2).and(pcolKV3).and(pcolKV4).and(pcolKV5);
+    PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pcolKV1).and(pcolKV2).and(pcolKV3).and(pcolKV4);
     PCollection<KV<String, String>> mergedKV = pCollList.apply(Flatten.<KV<String,String>>pCollections());
 
     // Group by Key to get a single record for each page
@@ -190,30 +176,22 @@ public class MinimalPageRankKandi {
     PCollection<KV<String, RankedPage>> job2in = kvStringReducedPairs.apply(ParDo.of(new Job1Finalizer()));
     
     // END JOB 1
-    // ========================================
-    // KV{python.md, python.md, 1.00000, 0, [README.md, 1.00000,1]}
-    // KV{go.md, go.md, 1.00000, 0, [README.md, 1.00000,1]}
-    // KV{README.md, README.md, 1.00000, 0, [go.md, 1.00000,3, java.md, 1.00000,3,
-    // python.md, 1.00000,3]}
-    // ========================================
+
     // BEGIN ITERATIVE JOB 2
     
     PCollection<KV<String, RankedPage>> job2out = null; 
-    int iterations = 20;
+
+    int iterations = 50;
     for (int i = 1; i <= iterations; i++) {
-      // use job2in to calculate job2 out
+      // use job2in to calculate job2 out      
       job2out = runJob2Iteration(job2in);
       // update job2in so it equals the new job2out
-      job2in = job2out;
+      job2in = job2out;      
     }
+
 
     // END ITERATIVE JOB 2
     // ========================================
-    // after 40 - output might look like this:
-    // KV{java.md, java.md, 0.69415, 0, [README.md, 1.92054,3]}
-    // KV{python.md, python.md, 0.69415, 0, [README.md, 1.92054,3]}
-    // KV{README.md, README.md, 1.91754, 0, [go.md, 0.69315,1, java.md, 0.69315,1,
-    // python.md, 0.69315,1]}
 
     // Map KVs to strings before outputting
     PCollection<String> output = job2out.apply(MapElements.into(
@@ -227,4 +205,3 @@ public class MinimalPageRankKandi {
   }
 
 }
-
