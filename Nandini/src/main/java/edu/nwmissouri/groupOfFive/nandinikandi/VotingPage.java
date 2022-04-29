@@ -1,6 +1,8 @@
 package edu.nwmissouri.groupOfFive.nandinikandi;
 
-public class VotingPage {
+import java.io.Serializable;
+
+public class VotingPage implements Serializable{
 
     public String nameIn = "'unknown.md";
     public Double rank = 1.0;
@@ -18,7 +20,7 @@ public class VotingPage {
     }
 
     public String getNameIn(){
-        return nameIn;
+        return this.nameIn;
     }
 
     public void setNameIn(String nameIn){
@@ -26,7 +28,7 @@ public class VotingPage {
     }
 
     public  Double getRank(){
-        return rank;
+        return this.rank;
     }
     
     public void setRank(Double rank ){
@@ -34,7 +36,7 @@ public class VotingPage {
     }
 
     public  Integer getVotes(){
-        return votes;
+        return this.votes;
     }
 
     public void setVotes(Integer votes ){
@@ -43,7 +45,7 @@ public class VotingPage {
 
     @Override
     public String toString(){
-        return String.format("%s, %.5s, %s", this.nameIn, this.rank, this.votes);
-    } 
+        return String.format("%s, %.5f, %d", this.nameIn, this.rank, this.votes);
+    }
 
 }
