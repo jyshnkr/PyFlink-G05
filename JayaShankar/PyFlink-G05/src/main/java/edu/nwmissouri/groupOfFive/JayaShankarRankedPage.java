@@ -8,14 +8,14 @@ public class JayaShankarRankedPage implements Serializable{
     String name = "unknown.md";
     Double rank = 1.000;
 
-    ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+    ArrayList<JayaShankarVotingPage> voters = new ArrayList<JayaShankarVotingPage>();
 
-    JayaShankarRankedPage(String nameIn, ArrayList<VotingPage> votersIn){
+    JayaShankarRankedPage(String nameIn, ArrayList<JayaShankarVotingPage> votersIn){
         this.name = nameIn;
         this.voters = votersIn;
     }
 
-    JayaShankarRankedPage(String nameIn, Double rankIn, ArrayList<VotingPage> votersIn){
+    JayaShankarRankedPage(String nameIn, Double rankIn, ArrayList<JayaShankarVotingPage> votersIn){
         this.name = nameIn;
         this.voters = votersIn;
         this.rank = rankIn;
@@ -25,7 +25,7 @@ public class JayaShankarRankedPage implements Serializable{
         return rank;
     }
     
-    public ArrayList<VotingPage> getVoters() {
+    public ArrayList<JayaShankarVotingPage> getVoters() {
         return voters;
     }
     

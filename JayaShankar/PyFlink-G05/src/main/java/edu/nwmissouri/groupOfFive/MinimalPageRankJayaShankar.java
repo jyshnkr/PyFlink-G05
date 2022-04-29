@@ -106,10 +106,10 @@ public class MinimalPageRankJayaShankar {
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
       }
-      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      ArrayList<JayaShankarVotingPage> voters = new ArrayList<JayaShankarVotingPage>();
       for (String voterName : element.getValue()) {
         if (!voterName.isEmpty()) {
-          voters.add(new VotingPage(voterName, contributorVotes));
+          voters.add(new JayaShankarVotingPage(voterName, contributorVotes));
         }
       }
       receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
@@ -125,10 +125,10 @@ public class MinimalPageRankJayaShankar {
         contributorVotes = ((Collection<String>) element.getValue()).size();
       }
 
-      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      ArrayList<JayaShankarVotingPage> voters = new ArrayList<JayaShankarVotingPage>();
       for (String voterName : element.getValue()) {
         if (!voterName.isEmpty()) {
-          voters.add(new VotingPage(voterName, contributorVotes));
+          voters.add(new JayaShankarVotingPage(voterName, contributorVotes));
         }
       }
       receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
@@ -143,10 +143,10 @@ public class MinimalPageRankJayaShankar {
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
       }
-      ArrayList<VotingPage> voters = new ArrayList<VotingPage>();
+      ArrayList<JayaShankarVotingPage> voters = new ArrayList<JayaShankarVotingPage>();
       for (String voterName : element.getValue()) {
         if (!voterName.isEmpty()) {
-          voters.add(new VotingPage(voterName, contributorVotes));
+          voters.add(new JayaShankarVotingPage(voterName, contributorVotes));
         }
       }
       receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
