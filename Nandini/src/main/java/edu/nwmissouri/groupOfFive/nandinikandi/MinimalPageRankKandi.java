@@ -165,7 +165,9 @@ public class MinimalPageRankKandi {
     PCollection<KV<String,String>> pcolKV2 = kandiMapper1(p,"python.md",folder);
     PCollection<KV<String,String>> pcolKV3 = kandiMapper1(p,"java.md",folder);
     PCollection<KV<String,String>> pcolKV4 = kandiMapper1(p,"README.md",folder);
-            
+    
+    // START JOB 1
+    
     PCollectionList<KV<String, String>> pCollList = PCollectionList.of(pcolKV1).and(pcolKV2).and(pcolKV3).and(pcolKV4);
     PCollection<KV<String, String>> mergedKV = pCollList.apply(Flatten.<KV<String,String>>pCollections());
 
@@ -188,8 +190,7 @@ public class MinimalPageRankKandi {
       // update job2in so it equals the new job2out
       job2in = job2out;      
     }
-
-
+    
     // END ITERATIVE JOB 2
     // ========================================
 
