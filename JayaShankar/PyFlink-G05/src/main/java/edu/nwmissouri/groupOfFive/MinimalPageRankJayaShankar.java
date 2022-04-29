@@ -98,10 +98,10 @@ public class MinimalPageRankJayaShankar {
    * The output of the Job1 Finalizer creates the initial input into our
    * iterative Job 2.
    */
-  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, RankedPage>> {
+  static class Job1Finalizer extends DoFn<KV<String, Iterable<String>>, KV<String, JayaShankarRankedPage>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
-        OutputReceiver<KV<String, RankedPage>> receiver) {
+        OutputReceiver<KV<String, JayaShankarRankedPage>> receiver) {
       Integer contributorVotes = 0;
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
@@ -112,14 +112,14 @@ public class MinimalPageRankJayaShankar {
           voters.add(new VotingPage(voterName, contributorVotes));
         }
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+      receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
     }
   }
 
-  static class Job2Mapper extends DoFn<KV<String, RankedPage>, KV<String, RankedPage>> {
+  static class Job2Mapper extends DoFn<KV<String, JayaShankarRankedPage>, KV<String, JayaShankarRankedPage>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
-        OutputReceiver<KV<String, RankedPage>> receiver) {
+        OutputReceiver<KV<String, JayaShankarRankedPage>> receiver) {
       Integer contributorVotes = 0;
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
@@ -131,14 +131,14 @@ public class MinimalPageRankJayaShankar {
           voters.add(new VotingPage(voterName, contributorVotes));
         }
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+      receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
     }
   }
 
-  static class Job2Updater extends DoFn<KV<String, Iterable<RankedPage>>, KV<String, RankedPage>> {
+  static class Job2Updater extends DoFn<KV<String, Iterable<JayaShankarRankedPage>>, KV<String, JayaShankarRankedPage>> {
     @ProcessElement
     public void processElement(@Element KV<String, Iterable<String>> element,
-        OutputReceiver<KV<String, RankedPage>> receiver) {
+        OutputReceiver<KV<String, JayaShankarRankedPage>> receiver) {
       Integer contributorVotes = 0;
       if (element.getValue() instanceof Collection) {
         contributorVotes = ((Collection<String>) element.getValue()).size();
@@ -149,7 +149,7 @@ public class MinimalPageRankJayaShankar {
           voters.add(new VotingPage(voterName, contributorVotes));
         }
       }
-      receiver.output(KV.of(element.getKey(), new RankedPage(element.getKey(), voters)));
+      receiver.output(KV.of(element.getKey(), new JayaShankarRankedPage(element.getKey(), voters)));
     }
   }
 
@@ -232,8 +232,8 @@ p.run().waitUntilFinish();
  *                       initial ranks.
  * @return - returns a PCollection<KV<String, RankedPage>> with updated ranks.
  */
-private static PCollection<KV<String, RankedPage>> runJob2Iteration(
-  PCollection<KV<String, RankedPage>> kvReducedPairs) {
+private static PCollection<KV<String, JayaShankarRankedPage>> runJob2Iteration(
+  PCollection<KV<String, JayaShankarRankedPage>> kvReducedPairs) {
 
 //    PCollection<KV<String, RankedPage>> mappedKVs = kvReducedPairs.apply(ParDo.of(new Job2Mapper()));
 
@@ -254,7 +254,7 @@ private static PCollection<KV<String, RankedPage>> runJob2Iteration(
 // python.md, 1.00000,1]}
 // KV{python.md, python.md, 0.43333, 0, [README.md, 1.00000,3]}
 
-PCollection<KV<String, RankedPage>> updatedOutput = null;
+PCollection<KV<String, JayaShankarRankedPage>> updatedOutput = null;
 return updatedOutput;
 }
 
