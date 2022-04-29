@@ -1,26 +1,30 @@
 package edu.nwmissouri.groupOfFive;
 
-public class VotingPage {
+import java.io.Serializable;
 
-  
-    public String voterName;
-    public Integer contributorVotes;
-    public VotingPage(String voterName, Integer contributorVotes) {
-        this.voterName = voterName;
-        this.contributorVotes = contributorVotes;
-    }
-    public String getVoterName(){
-        return voterName;
-    }
-    public  Integer getcontributorVotes(){
-        return contributorVotes;
-    }
-    public void setVoterName(String voterName){
-        this.voterName = voterName;
-    }
-    public void setcontributorVotes(Integer contributorVotes ){
-        this.contributorVotes = contributorVotes;
-    }
-
+public class ThotaVotingPage implements Serializable{
+    String name = "unknown.md";
+    Double rank = 1.0;
+    Integer votes = 0;
     
+    public ThotaVotingPage(String name, Double rank, Integer votes) {
+        this.name = name;
+        this.rank = rank;
+        this.votes = votes;
+    }
+    public ThotaVotingPage(String name, Integer votes) {
+        this.name = name;
+        this.votes = votes;
+    }
+    public String getName() {
+        return name;
+    }
+    public Double getRank() {
+        return rank;
+    }
+    @Override
+    public String toString() {
+        return String.format("%s,%.5f,%s", this.name,this.rank,this.votes);
+
+}
 }
