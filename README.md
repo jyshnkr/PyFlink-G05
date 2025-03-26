@@ -6,11 +6,11 @@
 | 1. JayaShankar Mangina     |https://github.com/jyshnkr/PyFlink-G05/tree/main/JayaShankar                 |
 | 2. Pariveshita Thota       |https://github.com/jyshnkr/PyFlink-G05/tree/main/Pariveshita                 |
 | 3. Abhilash Ramavaram      |https://github.com/jyshnkr/PyFlink-G05/tree/main/Abhilash                    |
-| 4. Madhu Babu Arla         |https://github.com/jyshnkr/PyFlink-G05/tree/main/Madhu                       |
+| 4. Madhu A         |https://github.com/jyshnkr/PyFlink-G05/tree/main/Madhu                       |
 | 5. Sai Naga Anu Teja Gunda |https://github.com/jyshnkr/PyFlink-G05/tree/main/Anutej                      |   
 | 6. Nandini Kandi           |https://github.com/jyshnkr/PyFlink-G05/tree/main/Nandini                     |
 
-<img src="https://user-images.githubusercontent.com/77635770/160168682-61663fb8-2c84-4ed7-8c64-f7e6310d3474.jpeg" width="750" height="750">
+
 
 # Description                         
                          
@@ -143,7 +143,7 @@ I have added the group image and reference Links for the content and examples we
 2. Added Contributor's space in README where the contributors can add their work & contributions.
 3. Moderated the content on README and made necessary changes.
 
-## Madhu Babu Arla
+## Madhu A
 
 I learned and researched about page rank and page rank algorithm, And posted the same.
 
