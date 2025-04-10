@@ -1,4 +1,4 @@
-# MADHU BABU ARLA. 
+# MADHU A. 
 ## MinimalPageRankBeam
 
 Java Quickstart for Apache Beam
